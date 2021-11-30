@@ -1,16 +1,20 @@
 {
-  "name": "gatsby-starter-plugin",
-  "version": "1.0.0",
-  "description": "A minimal boilerplate for the essential files Gatsby looks for in a plugin",
-  "main": "index.js",
+  "name": "gatsby-source-flickr",
+  "description": "A Gatsby source plugin to load resources from the Flickr photo search API.",
+  "author": "Chris Searle <chris@chrissearle.org>",
+  "repository": "https://github.com/chrissearle/gatsby-source-flickr.git",
+  "keywords": [
+    "gatsby",
+    "gatsby-plugin",
+    "flickr",
+    "photos"
+  ],
+  "license": "MIT",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "echo \"No build script setup\""
   },
-  "keywords": [
-    "gatsby",
-    "gatsby-plugin"
-  ],
-  "author": "Kyle Gill <kyle.robert.gill@gmail.com>",
-  "license": "0BSD"
+  "dependencies": {
+    "node-fetch": "^2.6.6"
+  }
 }
