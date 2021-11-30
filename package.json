@@ -16,5 +16,8 @@
   },
   "dependencies": {
     "node-fetch": "^2.6.6"
+  },
+  "peerDependencies": {
+    "gatsby": "^4.0.0"
   }
 }
