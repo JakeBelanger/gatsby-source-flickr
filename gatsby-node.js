@@ -1,10 +1,9 @@
-// import "core-js/stable";
-// import "regenerator-runtime/runtime";
 const { URLSearchParams } = require('url');
+const { createRemoteFileNode } = require('gatsby-source-filesystem');
 const fetch = require('node-fetch');
 
 exports.sourceNodes = async (
-  { actions: { createNode }, createNodeId, createContentDigest },
+  { actions: { createNode }, createNodeId, createContentDigest, store, cache },
   { plugins, ...options }
 ) => {
   const sizes = ['sq', 't', 's', 'q', 'm', 'n', 'z,', 'c', 'l', 'z'];
@@ -89,14 +88,27 @@ exports.sourceNodes = async (
 
     if (!photos) throw JSON.stringify(data);
 
-    photos.photo.forEach(raw => {
+    // @TODO: gather all the async tasks
+    photos.photo.forEach(async raw => {
       const photo = fixPhoto(raw);
+      const nodeId = createNodeId(`flickr-photo-${photo.photo_id}`);
+
+      const fileNode = await createRemoteFileNode({
+        url: photo.url_o, // string that points to the URL of the image\
+        createNode, // helper function in gatsby-node to generate the node
+        createNodeId, // helper function in gatsby-node to generate the node id
+        cache, // Gatsby's cache
+        store, // Gatsby's Redux store
+      });
+
+      // photo.localFile = fileNode;
+      photo.localFile___NODE = fileNode.id;
 
       createNode({
         ...photo,
-        id: createNodeId(`flickr-photo-${photo.photo_id}`),
+        id: nodeId,
         parent: null,
-        children: [],
+        children: [fileNode.id],
         internal: {
           type: 'FlickrPhoto',
           content: JSON.stringify(photo),
@@ -122,4 +134,14 @@ exports.sourceNodes = async (
     nojsoncallback: 1,
     ...options,
   });
+};
+
+exports.createSchemaCustomization = ({ actions }) => {
+  const { createTypes } = actions;
+
+  createTypes(`
+    type FlickrPhoto implements Node {
+      localFile: File @link(from: "localFile___NODE")
+    }
+  `);
 };
