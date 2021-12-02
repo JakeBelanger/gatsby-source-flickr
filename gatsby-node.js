@@ -6,7 +6,7 @@ exports.sourceNodes = async (
   { actions: { createNode }, createNodeId, createContentDigest, store, cache },
   { plugins, ...options }
 ) => {
-  const sizes = ['sq', 't', 's', 'q', 'm', 'n', 'z,', 'c', 'l', 'z'];
+  // const sizes = ['sq', 't', 's', 'q', 'm', 'n', 'z,', 'c', 'l', 'z'];
 
   // The flickr API has some issues when put into GraphQL - create a suitable version
   const fixPhoto = photo => {
@@ -16,16 +16,24 @@ exports.sourceNodes = async (
     fixed.photo_id = fixed.id;
     delete fixed.id;
 
+    fixed.original_src = photo.url_o;
+    delete fixed.url_o;
+
+    fixed.width = parseInt(photo.width_o);
+    delete fixed.width_o;
+    fixed.height = parseInt(photo.height_o);
+    delete fixed.height_o;
+
     // Some fields can come down as either string or number. GraphQL doesn't like that. Force everything to number
 
-    sizes.forEach(suffix => {
-      if (fixed.hasOwnProperty(`height_${suffix}`)) {
-        fixed[`height_${suffix}`] = parseInt(fixed[`height_${suffix}`]);
-      }
-      if (fixed.hasOwnProperty(`width_${suffix}`)) {
-        fixed[`width_${suffix}`] = parseInt(fixed[`width_${suffix}`]);
-      }
-    });
+    // sizes.forEach(suffix => {
+    //   if (fixed.hasOwnProperty(`height_${suffix}`)) {
+    //     fixed[`height_${suffix}`] = parseInt(fixed[`height_${suffix}`]);
+    //   }
+    //   if (fixed.hasOwnProperty(`width_${suffix}`)) {
+    //     fixed[`width_${suffix}`] = parseInt(fixed[`width_${suffix}`]);
+    //   }
+    // });
 
     if (fixed.hasOwnProperty('accuracy')) {
       fixed.accuracy = parseInt(fixed.accuracy);
@@ -52,10 +60,10 @@ exports.sourceNodes = async (
     // Convert Date versions of dateupload and lastupdate
 
     if (fixed.hasOwnProperty('dateupload')) {
-      fixed.dateupload_date = new Date(fixed.dateupload * 1000);
+      fixed.dateupload = new Date(fixed.dateupload * 1000);
     }
     if (fixed.hasOwnProperty('lastupdate')) {
-      fixed.lastupdate_date = new Date(fixed.lastupdate * 1000);
+      fixed.lastupdate = new Date(fixed.lastupdate * 1000);
     }
 
     // Simplify the structure of the description to just a string
@@ -94,21 +102,19 @@ exports.sourceNodes = async (
       const nodeId = createNodeId(`flickr-photo-${photo.photo_id}`);
 
       const fileNode = await createRemoteFileNode({
-        url: photo.url_o, // string that points to the URL of the image\
+        url: photo.original_src, // string that points to the URL of the image\
         createNode, // helper function in gatsby-node to generate the node
         createNodeId, // helper function in gatsby-node to generate the node id
         cache, // Gatsby's cache
         store, // Gatsby's Redux store
       });
 
-      // photo.localFile = fileNode;
-      photo.localFile___NODE = fileNode.id;
-
       createNode({
         ...photo,
+        localFile: fileNode.id,
         id: nodeId,
         parent: null,
-        children: [fileNode.id],
+        children: [],
         internal: {
           type: 'FlickrPhoto',
           content: JSON.stringify(photo),
@@ -127,7 +133,7 @@ exports.sourceNodes = async (
   await callFlickr({
     method: 'flickr.photos.search',
     extras:
-      'description, license, date_upload, date_taken, owner_name, icon_server, original_format, last_update, geo, tags, machine_tags, o_dims, views, media, path_alias, url_sq, url_t, url_s, url_q, url_m, url_n, url_z, url_c, url_l, url_o',
+      'description, license, date_upload, date_taken, owner_name, original_format, last_update, geo, tags, machine_tags, views, media, url_o',
     per_page: 500,
     page: 1,
     format: 'json',
@@ -141,8 +147,30 @@ exports.createSchemaCustomization = ({ actions }) => {
 
   createTypes(`
     type FlickrPhoto implements Node {
-      localFile: File @link(from: "localFile___NODE")
+      localFile: File @link
+      id: String
+      secret: String
+      server: String
+
       title: String
+      description: String
+      original_src: String
+      width: Int
+      height: Int
+      originalformat: String
+
+      owner_name: String
+      media: String
+      views: Int
+      tags: String 
+      machine_tags: String
+      license: String
+
+      dateupload: Date
+
+      datetaken: Date
+
+      lastupdate: Date
     }
   `);
 };
