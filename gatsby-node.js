@@ -142,6 +142,7 @@ exports.createSchemaCustomization = ({ actions }) => {
   createTypes(`
     type FlickrPhoto implements Node {
       localFile: File @link(from: "localFile___NODE")
+      title: String
     }
   `);
 };
