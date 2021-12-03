@@ -3,6 +3,7 @@
   "description": "A Gatsby source plugin to load resources from the Flickr photo search API.",
   "author": "Chris Searle <chris@chrissearle.org>",
   "repository": "https://github.com/chrissearle/gatsby-source-flickr.git",
+  "version": "1.0.0",
   "keywords": [
     "gatsby",
     "gatsby-plugin",

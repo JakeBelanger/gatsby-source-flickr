@@ -167,9 +167,7 @@ exports.createSchemaCustomization = ({ actions }) => {
       license: String
 
       dateupload: Date
-
       datetaken: Date
-
       lastupdate: Date
     }
   `);
