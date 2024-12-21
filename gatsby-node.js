@@ -1,6 +1,6 @@
-const { URLSearchParams } = require('url');
-const { createRemoteFileNode } = require('gatsby-source-filesystem');
-const fetch = require('node-fetch');
+const { URLSearchParams } = require("url");
+const { createRemoteFileNode } = require("gatsby-source-filesystem");
+const fetch = require("node-fetch");
 
 exports.sourceNodes = async (
   { actions: { createNode }, createNodeId, createContentDigest, store, cache },
@@ -9,7 +9,7 @@ exports.sourceNodes = async (
   // const sizes = ['sq', 't', 's', 'q', 'm', 'n', 'z,', 'c', 'l', 'z'];
 
   // The flickr API has some issues when put into GraphQL - create a suitable version
-  const fixPhoto = photo => {
+  const fixPhoto = (photo) => {
     const fixed = photo;
 
     // Don't name crash with node.id
@@ -35,41 +35,41 @@ exports.sourceNodes = async (
     //   }
     // });
 
-    if (fixed.hasOwnProperty('accuracy')) {
+    if (fixed.hasOwnProperty("accuracy")) {
       fixed.accuracy = parseInt(fixed.accuracy);
     }
 
     // A missing latitude or longitude can come down as either 0 or "0" - force to string
 
-    if (fixed.hasOwnProperty('latitude')) {
-      fixed.latitude = '' + fixed.latitude;
+    if (fixed.hasOwnProperty("latitude")) {
+      fixed.latitude = "" + fixed.latitude;
     }
-    if (fixed.hasOwnProperty('longitude')) {
-      fixed.longitude = '' + fixed.longitude;
+    if (fixed.hasOwnProperty("longitude")) {
+      fixed.longitude = "" + fixed.longitude;
     }
 
     // These can come down as either string or number. Have only ever seen "0" and 0 here - and documentation is sparse - remove them
 
-    if (fixed.hasOwnProperty('datetakengranularity')) {
+    if (fixed.hasOwnProperty("datetakengranularity")) {
       delete fixed.datetakengranularity;
     }
-    if (fixed.hasOwnProperty('datetakenunknown')) {
+    if (fixed.hasOwnProperty("datetakenunknown")) {
       delete fixed.datetakenunknown;
     }
 
     // Convert Date versions of dateupload and lastupdate
 
-    if (fixed.hasOwnProperty('dateupload')) {
+    if (fixed.hasOwnProperty("dateupload")) {
       fixed.dateupload = new Date(fixed.dateupload * 1000);
     }
-    if (fixed.hasOwnProperty('lastupdate')) {
+    if (fixed.hasOwnProperty("lastupdate")) {
       fixed.lastupdate = new Date(fixed.lastupdate * 1000);
     }
 
     // Simplify the structure of the description to just a string
 
-    if (fixed.hasOwnProperty('description')) {
-      if (fixed.description.hasOwnProperty('_content')) {
+    if (fixed.hasOwnProperty("description")) {
+      if (fixed.description.hasOwnProperty("_content")) {
         fixed.description = fixed.description._content;
       }
     }
@@ -77,15 +77,15 @@ exports.sourceNodes = async (
     return fixed;
   };
 
-  const unwrap = data => {
-    if (data.hasOwnProperty('photoset')) {
+  const unwrap = (data) => {
+    if (data.hasOwnProperty("photoset")) {
       return data.photoset;
     }
 
     return data.photos;
   };
 
-  const callFlickr = async options => {
+  const callFlickr = async (options) => {
     const params = new URLSearchParams(options);
     const url = `https://api.flickr.com/services/rest/?${params.toString()}`;
 
@@ -97,7 +97,7 @@ exports.sourceNodes = async (
     if (!photos) throw JSON.stringify(data);
 
     // @TODO: gather all the async tasks
-    photos.photo.forEach(async raw => {
+    photos.photo.forEach(async (raw) => {
       const photo = fixPhoto(raw);
       const nodeId = createNodeId(`flickr-photo-${photo.photo_id}`);
 
@@ -116,7 +116,7 @@ exports.sourceNodes = async (
         parent: null,
         children: [],
         internal: {
-          type: 'FlickrPhoto',
+          type: "FlickrPhoto",
           content: JSON.stringify(photo),
           contentDigest: createContentDigest(photo),
         },
@@ -131,12 +131,12 @@ exports.sourceNodes = async (
   };
 
   await callFlickr({
-    method: 'flickr.photos.search',
+    method: "flickr.photos.search",
     extras:
-      'description, license, date_upload, date_taken, owner_name, original_format, last_update, geo, tags, machine_tags, views, media, url_o',
+      "description, license, date_upload, date_taken, owner_name, original_format, last_update, geo, tags, machine_tags, views, media, url_o",
     per_page: 500,
     page: 1,
-    format: 'json',
+    format: "json",
     nojsoncallback: 1,
     ...options,
   });
