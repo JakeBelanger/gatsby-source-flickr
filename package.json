@@ -1,9 +1,9 @@
 {
   "name": "gatsby-source-flickr",
   "description": "A Gatsby source plugin to load resources from the Flickr photo search API.",
-  "author": "Chris Searle <chris@chrissearle.org>",
-  "repository": "https://github.com/chrissearle/gatsby-source-flickr.git",
-  "version": "1.0.0",
+  "author": "Jacob Belanger <me@jacobbelanger.com>",
+  "repository": "https://github.com/JakeBelanger/gatsby-source-flickr.git",
+  "version": "2.0.0",
   "keywords": [
     "gatsby",
     "gatsby-plugin",
@@ -16,11 +16,11 @@
     "build": "echo \"No build script setup\""
   },
   "dependencies": {
-    "gatsby-source-filesystem": "^4.3.0",
-    "gatsby-transformer-sharp": "^4.3.0",
-    "node-fetch": "^2.6.6"
+    "gatsby-source-filesystem": "^5.14.0",
+    "gatsby-transformer-sharp": "^5.14.0",
+    "node-fetch": "^3.3.2"
   },
   "peerDependencies": {
-    "gatsby": "^4.0.0"
+    "gatsby": "^5.0.0"
   }
 }
