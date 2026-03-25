@@ -3,7 +3,7 @@ const { createRemoteFileNode } = require("gatsby-source-filesystem");
 
 exports.sourceNodes = async (
   { actions: { createNode }, createNodeId, createContentDigest, cache },
-  { plugins, ...options }
+  { plugins, ...options },
 ) => {
   // const sizes = ['sq', 't', 's', 'q', 'm', 'n', 'z,', 'c', 'l', 'z'];
 
@@ -15,13 +15,21 @@ exports.sourceNodes = async (
     fixed.photo_id = fixed.id;
     delete fixed.id;
 
-    fixed.original_src = photo.url_o;
-    delete fixed.url_o;
+    // Fall back through original → k-large → large sizes
+    const srcSize = ["o", "k", "l"].find((s) => photo[`url_${s}`]);
+    fixed.original_src = srcSize ? photo[`url_${srcSize}`] : null;
+    fixed.width = srcSize ? parseInt(photo[`width_${srcSize}`]) : null;
+    fixed.height = srcSize ? parseInt(photo[`height_${srcSize}`]) : null;
 
-    fixed.width = parseInt(photo.width_o);
+    delete fixed.url_o;
     delete fixed.width_o;
-    fixed.height = parseInt(photo.height_o);
     delete fixed.height_o;
+    delete fixed.url_k;
+    delete fixed.width_k;
+    delete fixed.height_k;
+    delete fixed.url_l;
+    delete fixed.width_l;
+    delete fixed.height_l;
 
     // Some fields can come down as either string or number. GraphQL doesn't like that. Force everything to number
 
@@ -131,7 +139,7 @@ exports.sourceNodes = async (
   await callFlickr({
     method: "flickr.photos.search",
     extras:
-      "description, license, date_upload, date_taken, owner_name, original_format, last_update, geo, tags, machine_tags, views, media, url_o",
+      "description, license, date_upload, date_taken, owner_name, original_format, last_update, geo, tags, machine_tags, views, media, url_o, width_o, height_o, url_k, width_k, height_k, url_l, width_l, height_l",
     per_page: 500,
     page: 1,
     format: "json",
