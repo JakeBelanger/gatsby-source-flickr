@@ -16,7 +16,7 @@ exports.sourceNodes = async (
     delete fixed.id;
 
     // Fall back through original → k-large → large sizes
-    const srcSize = ["o", "k", "l"].find((s) => photo[`url_${s}`]);
+    const srcSize = ["o", "k", "l", "c"].find((s) => photo[`url_${s}`]);
     fixed.original_src = srcSize ? photo[`url_${srcSize}`] : null;
     fixed.width = srcSize ? parseInt(photo[`width_${srcSize}`]) : null;
     fixed.height = srcSize ? parseInt(photo[`height_${srcSize}`]) : null;
@@ -139,7 +139,7 @@ exports.sourceNodes = async (
   await callFlickr({
     method: "flickr.photos.search",
     extras:
-      "description, license, date_upload, date_taken, owner_name, original_format, last_update, geo, tags, machine_tags, views, media, url_o, width_o, height_o, url_k, width_k, height_k, url_l, width_l, height_l",
+      "description, license, date_upload, date_taken, owner_name, original_format, last_update, geo, tags, machine_tags, views, media, url_o, width_o, height_o, url_k, width_k, height_k, url_l, width_l, height_l, url_c, width_c, height_c",
     per_page: 500,
     page: 1,
     format: "json",
