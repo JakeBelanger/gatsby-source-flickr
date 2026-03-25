@@ -1,9 +1,8 @@
 const { URLSearchParams } = require("url");
 const { createRemoteFileNode } = require("gatsby-source-filesystem");
-const fetch = require("node-fetch");
 
 exports.sourceNodes = async (
-  { actions: { createNode }, createNodeId, createContentDigest, store, cache },
+  { actions: { createNode }, createNodeId, createContentDigest, cache },
   { plugins, ...options }
 ) => {
   // const sizes = ['sq', 't', 's', 'q', 'm', 'n', 'z,', 'c', 'l', 'z'];
@@ -102,11 +101,10 @@ exports.sourceNodes = async (
       const nodeId = createNodeId(`flickr-photo-${photo.photo_id}`);
 
       const fileNode = await createRemoteFileNode({
-        url: photo.original_src, // string that points to the URL of the image\
-        createNode, // helper function in gatsby-node to generate the node
-        createNodeId, // helper function in gatsby-node to generate the node id
-        cache, // Gatsby's cache
-        store, // Gatsby's Redux store
+        url: photo.original_src,
+        createNode,
+        createNodeId,
+        cache,
       });
 
       createNode({
